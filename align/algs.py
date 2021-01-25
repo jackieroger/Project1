@@ -12,9 +12,8 @@ class PairwiseAligner:
 
 	# Takes in the name of a fasta file, finds that file, reads in the contents,
 	# and returns the sequence contained in the file
-	def load_fasta(self, fasta_name):
+	def load_fasta(self, fasta_file):
 		seq = ""
-		fasta_file = "sequences/" + fasta_name
 		with open(fasta_file) as ff:
 			for line in ff:
 				# Ignore header
