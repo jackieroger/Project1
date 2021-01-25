@@ -185,7 +185,7 @@ class PairwiseAligner:
 		self.alignment[0] = self.alignment[0][::-1]
 		self.alignment[1] = self.alignment[1][::-1]
 
-	# Takes in 2 sequences and returns an alignment
+	# Takes in 2 sequences and returns an alignment (score is saved as self.alignment_score)
 	# The returned alignment is a 2-element list of strings corresponding to the aligned seq1 & seq2
 	def align(self, seq1, seq2):
 		# Save sequences
@@ -199,14 +199,14 @@ class PairwiseAligner:
 		# Fill in alignment matrices
 		self.call_populate_alignment_matrices()
 		# Get alignment score
-		self.get_alignment_score()
+		self.alignment_score = self.get_alignment_score()
 		# Get alignment
 		self.get_alignment()
 		# Return the alignment, which is a 2 element list [alignment of seq1, alignment of seq2]
 		# where dashes (-) represent gaps and underscores (_) represent offsets for local (SW) alignment
 		return self.alignment
 
-	# Takes in 2 sequences and calculates an alignment score without doing a traceback or generating alignment output
+	# Takes in 2 sequences and returns an alignment score without doing a traceback or generating alignment output
 	# (useful for part 2 of the assignment)
 	def score(self, seq1, seq2):
 		# Save sequences
@@ -220,7 +220,8 @@ class PairwiseAligner:
 		# Fill in alignment matrices
 		self.call_populate_alignment_matrices()
 		# Get alignment score
-		self.get_alignment_score()
+		self.alignment_score = self.get_alignment_score()
+		return self.alignment_score
 
 
 # Child alignment class for smith-waterman alignments
@@ -243,7 +244,7 @@ class SmithWaterman(PairwiseAligner):
 	# Inherited from parent class
 	def get_alignment_score(self):
 		# Find maximum m value
-		self.alignment_score = np.amax(self.m)
+		return int(np.amax(self.m))
 
 	# Get traceback start
 	# Inherited from parent class
@@ -286,7 +287,7 @@ class NeedlemanWunsch(PairwiseAligner):
 		ix_val = self.ix[self.num_rows-1, self.num_cols-1]
 		iy_val = self.iy[self.num_rows-1, self.num_cols-1]
 		# Take max
-		self.alignment_score = max(m_val, ix_val, iy_val)
+		return int(max(m_val, ix_val, iy_val))
 
 	# Get traceback start
 	# Inherited from parent class
@@ -308,3 +309,4 @@ class NeedlemanWunsch(PairwiseAligner):
 	# Inherited from parent class
 	def check_traceback_end_condition(self, i, j):
 		return (i == 0 and j == 0)
+

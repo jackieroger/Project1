@@ -104,8 +104,34 @@ def test_identical():
 	assert nw_align3 == correct_align3
 	assert nw_align4 == correct_align4
 
-# For 4 different alignments, check that the alignment score is correct
+# For 3 different alignments, check that the alignment score is correct
 # (for both smith-waterman & needleman-wunsch)
 def test_alignment_score():
-	assert True
+	# Make sequences
+	seq1 = "CALM"
+	seq2 = "ACALMA"
+	seq3 = "ACACT"
+	seq4 = "AAT"
+	seq5 = "HEAGAWEGHEE"
+	seq6 = "PAWHEAE"
+	# Load SW & NW objects
+	sw = algs.SmithWaterman("BLOSUM50", -3, -1)
+	sw.load_scoring_matrix()
+	nw = algs.NeedlemanWunsch("BLOSUM50", -3, -1)
+	nw.load_scoring_matrix()
+	# Get alignment scores
+	sw_s1 = sw.score(seq1, seq2)
+	sw_s2 = sw.score(seq3, seq4)
+	sw_s3 = sw.score(seq5, seq6)
+	nw_s1 = nw.score(seq1, seq2)
+	nw_s2 = nw.score(seq3, seq4)
+	nw_s3 = nw.score(seq5, seq6)
+	# Check that they match
+	assert sw_s1 == 30
+	assert sw_s2 == 9
+	assert sw_s3 == 33
+	assert nw_s1 == 22
+	assert nw_s2 == 7
+	assert nw_s3 == 25
+
 
