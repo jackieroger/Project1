@@ -16,7 +16,7 @@ python -m pytest test/*
 
 ## Class methods & attributes
 
-#### init()
+#### \_\_init\_\_()
 - This is called automatically when a new class object is created
 - Takes in match/mismatch score matrix type (string), gap opening penalty (int), and gap extension penalty (int)
 - Returns class object (either SmithWaterman or NeedlemanWunsch)
