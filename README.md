@@ -16,11 +16,11 @@ python -m pytest test/*
 
 ## Class methods & attributes
 
-##### load_fasta()
+#### load_fasta()
 - Takes in a string representing a path to a fasta file
 - Returns a string representing the sequence contained in the file
 
-##### load_scoring_matrix()
+#### load_scoring_matrix()
 - Takes in no parameters
 - Loads the appropriate scoring matrix based on the name of the scoring matrix that was passed in during object initialization
 - Creates attributes: **score_matrix** (2d numpy array representing the user-indicated score matrix) and **residue_indices** (dictionary mapping between indices and their column/row in the score matrix)
@@ -41,15 +41,21 @@ python -m pytest test/*
 Example using smith-waterman
 ```
 from align import algs
+
 # Create sw object
 sw = algs.SmithWaterman("BLOSUM50", -3, -1)
+
 # Load scoring matrix
 sw.load_scoring_matrix()
+
 # Load sequence data
+seq1 = sw.load_fasta("test_data/prot-0004.fa")
+seq2 = sq.load_fasta("test_data/prot-0915.fa")
 
 # Do alignment
-sw_alignment = sw.align("ATCG", "ATAT")
+sw_alignment = sw.align(seq1, seq2) # run alignment
 sw_alignment_score = sw.alignment_score
+
 # Alternatively, just score alignment (without doing traceback to get alignment)
-sw_alignment_score = sw.score("ATCG", "ATAT")
+sw_alignment_score = sw.score(seq1, seq2)
 ```
