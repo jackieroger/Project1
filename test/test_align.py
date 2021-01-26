@@ -10,12 +10,12 @@ def some_relevant_data():
 # and the correct fasta sequence is outputted
 def test_fasta_io():
 	pa = algs.PairwiseAligner("PAM100", -10, -3)
-	seq1 = pa.load_fasta("fasta_test_files/prot-0004.fa")
+	seq1 = pa.load_fasta("test_data/prot-0004.fa")
 	correct_seq1 = "SLEAAQKSNVTSSWAKASAAWGTAGPEFFMALFDAHDDVFAKFSGLFSGAAKGTVKNTPEMAAQAQSFKGLVSNWVDNLDNAGALEGQCKTFAANHKARGISAGQLEAAFKVLSGFMKSYGGDEGAWTAVAGALMGEIEPDM"
-	seq2 = pa.load_fasta("fasta_test_files/prot-0915.fa")
+	seq2 = pa.load_fasta("test_data/prot-0915.fa")
 	correct_seq2 = "MKKATCLTDDQRWQSVLARDPNADGEFVFAVRTTGIFCRPSCRARHALRENVSFYANASEALAAGFRPCKRCQPDKANPRQHRLDKITHACR"
 	# This one has lowercase letters so it checks the lower to upper conversion too
-	seq3 = pa.load_fasta("fasta_test_files/prot-0819.fa")
+	seq3 = pa.load_fasta("test_data/prot-0819.fa")
 	correct_seq3 = "ALLSFERKYRVRGGTLIGGDLFDFWVGPYFVGFFGVSAIFFIFLGVSLIGYAASQGPTWDPFAISINPPDLKYGLGAAPLLEGGFWQAITVCALGAFISWMLREVEISRKLGIGWHVPLAFCVPIFMFCVLQVFRPLLLGSWGHAFPYGILSHLDWVNNFGYQYLNWHYNPGHMSSVSFLFVNAMALGLHGGLILSVANPGDGDKVKTAEHENQYFRDVVGYSIGALSIHRLGLFLASNIFLTGAFGTIASGPFXXXXXXXXXXXXLDIPFWS"
 	# Check that they match
 	assert seq1 == correct_seq1
