@@ -38,7 +38,7 @@ python -m pytest test/*
 
 ## Example usage
 
-Example using smith-waterman
+Example using smith-waterman (run from project root directory)
 ```
 from align import algs
 
