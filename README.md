@@ -62,7 +62,7 @@ sw_alignment_score = sw.score(seq1, seq2)
 
 ### For the curious user...
 
-If you'd like to explore the alignment score matrices generated when align() is called, the 2d numpy arrays representing them are called:
+If you'd like to explore the alignment score matrices generated when align() is called, the class attributes (2d numpy arrays) representing them are called:
 - **m**: match/mismatch matrix
 - **ix**: gap matrix for seq1
 - **iy**: gap matrix for seq2
