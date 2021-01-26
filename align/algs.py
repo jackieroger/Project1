@@ -3,7 +3,7 @@ import numpy as np
 # Parent alignment class with methods shared between both smith-waterman & needleman-wunsch
 class PairwiseAligner:
 
-	# Initializes PairwiseAligner class with the following parameters:
+	# Initializes PairwiseAligner object with the following parameters:
 	# score matrix, gap opening penalty, & gap extension penalty
 	def __init__(self, score_matrix_type, gap_opening_penalty, gap_extension_penalty):
 		self.score_matrix_type = score_matrix_type
@@ -91,7 +91,8 @@ class PairwiseAligner:
 		pt_matrix[i, j] = neighbors[0][0]
 		pl_matrix[i, j] = location
 
-	# Fill in each alignment matrix
+	# Fill in each alignment matrix using ~dynamic programming~
+	# Start near the top left corner and slowly work down/right through the matrices
 	def populate_alignment_matrices(self, sw=False):
 		# Iterate through each row (0th row is already set up)
 		for i in range(1, self.num_rows):
