@@ -53,7 +53,7 @@ seq1 = sw.load_fasta("test_data/prot-0004.fa")
 seq2 = sq.load_fasta("test_data/prot-0915.fa")
 
 # Do alignment
-sw_alignment = sw.align(seq1, seq2) # run alignment
+sw_alignment = sw.align(seq1, seq2)
 sw_alignment_score = sw.alignment_score
 
 # Alternatively, just score alignment (without doing traceback to get alignment)
