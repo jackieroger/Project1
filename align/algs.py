@@ -46,31 +46,22 @@ class PairwiseAligner:
 	# Make each alignment matrix
 	# Description of each matrix:
 	# - 3 matrices for cell values: match/mismatch (m), gap in seq1 (ix), gap in seq2 (iy))
-	# - 6 matrices for pointers: pl_m, pl_ix, pl_iy, pt_m, pt_ix, pt_iy
-	# - the pl matrices are location pointers & the pt matrices are type pointers
+	# - 3 matrices for pointers: pt_m, pt_ix, pt_iy
+	# - the pt matrices are type pointers
 	# - the possible values for the pt matrices are m, ix and iy
-	# - the possible values for the pl matrices are diag, up, and left
-	# (for example, if pl_m[2,2]=="diag" & pl_m[2,2]=="ix", that means that the value for m
-	# at cell [2,2] comes from the value for ix at [1,1], so there's a pointer from m[2,2]
-	# to ix[1,1])
 	# Cells of m, ix, and iy are initialized as -inf
-	# Cells of pl_m, pl_ix, pl_iy, pt_m, pt_ix, pt_iy are initialized as j (for jackie :))
+	# Cells of pt_m, pt_ix, pt_iy are initialized as j (for jackie :)) (arbitrary value that is later overwritten)
 	# Visually, seq1 is along the top of the matrix and seq2 is along the left of the matrix
 	def make_alignment_matrices(self):
 		# Make matrices
 		self.m = np.full((self.num_rows, self.num_cols), float("-inf"), dtype=float)
 		self.ix = np.full((self.num_rows, self.num_cols), float("-inf"), dtype=float)
 		self.iy = np.full((self.num_rows, self.num_cols), float("-inf"), dtype=float)
-		self.pl_m = np.full((self.num_rows, self.num_cols), "j", dtype="object")
-		self.pl_ix = np.full((self.num_rows, self.num_cols), "j", dtype="object")
-		self.pl_iy = np.full((self.num_rows, self.num_cols), "j", dtype="object")
 		self.pt_m = np.full((self.num_rows, self.num_cols), "j", dtype="object")
 		self.pt_ix = np.full((self.num_rows, self.num_cols), "j", dtype="object")
 		self.pt_iy = np.full((self.num_rows, self.num_cols), "j", dtype="object")
 		# Set up pointers for left column of ix and top row of iy
-		self.pl_ix[1:, 0] = "up"
 		self.pt_ix[1:, 0] = "ix"
-		self.pl_iy[0, 1:] = "left"
 		self.pt_iy[0, 1:] = "iy"
 
 	# Initialize alignment matrices
@@ -81,7 +72,7 @@ class PairwiseAligner:
 	# Helper function for populate_alignment_matrices() that evaluates the neighbors for a given cell
 	# and updates that cell with the correct score and pointers
 	# The sw_m flag indicates if 0 should be added to the m neighbors list (for smith-waterman)
-	def update_cell(self, i, j, neighbors, matrix, pt_matrix, pl_matrix, location, sw_m=False):
+	def update_cell(self, i, j, neighbors, matrix, pt_matrix, sw_m=False):
 		# Sort neighbors (decreasing), get the max score (0th tuple), update matrix, and save pointers accordingly
 		if sw_m == True:
 			neighbors.append(("j", 0)) # back to j for jackie :) since no pointer needed
@@ -89,7 +80,6 @@ class PairwiseAligner:
 		neighbors.sort(key=lambda n: (n[1], n[0]), reverse=True)
 		matrix[i, j] = neighbors[0][1]
 		pt_matrix[i, j] = neighbors[0][0]
-		pl_matrix[i, j] = location
 
 	# Fill in each alignment matrix using ~dynamic programming~
 	# Start near the top left corner and slowly work down/right through the matrices
@@ -107,19 +97,19 @@ class PairwiseAligner:
 							 ("iy", self.iy[i - 1, j - 1] + s)]
 				# For smith-waterman, add 0 as an option for the value of the cell in m
 				if sw == True:
-					self.update_cell(i, j, m_neighbors, self.m, self.pt_m, self.pl_m, "diag", sw_m=True)
+					self.update_cell(i, j, m_neighbors, self.m, self.pt_m, sw_m=True)
 				else:
-					self.update_cell(i, j, m_neighbors, self.m, self.pt_m, self.pl_m, "diag")
+					self.update_cell(i, j, m_neighbors, self.m, self.pt_m)
 				# Find the value for ix at that cell
 				ix_neighbors = []
 				ix_neighbors.append(("m", self.m[i - 1, j] + self.gap_opening_penalty + self.gap_extension_penalty))
 				ix_neighbors.append(("ix", self.ix[i - 1, j] + self.gap_extension_penalty))
-				self.update_cell(i, j, ix_neighbors, self.ix, self.pt_ix, self.pl_ix, "up")
+				self.update_cell(i, j, ix_neighbors, self.ix, self.pt_ix)
 				# Find the value for ix at that cell
 				iy_neighbors = []
 				iy_neighbors.append(("m", self.m[i, j - 1] + self.gap_opening_penalty + self.gap_extension_penalty))
 				iy_neighbors.append(("iy", self.iy[i, j - 1] + self.gap_extension_penalty))
-				self.update_cell(i, j, iy_neighbors, self.iy, self.pt_iy, self.pl_iy, "left")
+				self.update_cell(i, j, iy_neighbors, self.iy, self.pt_iy)
 
 	# Calls method to populate alignment matrices with flag for NW or SW
 	# Passed to child classes
@@ -145,11 +135,10 @@ class PairwiseAligner:
 	def get_alignment(self):
 		# Make a dictionary to map from pointers to matrices (for both type & location)
 		type_map = {}
-		type_map["m"] = [self.m, self.pt_m, self.pl_m]
-		type_map["ix"] = [self.ix, self.pt_ix, self.pl_ix]
-		type_map["iy"] = [self.iy, self.pt_iy, self.pl_iy]
+		type_map["m"] = [self.m, self.pt_m, (-1,-1)]
+		type_map["ix"] = [self.ix, self.pt_ix, (-1,0)]
+		type_map["iy"] = [self.iy, self.pt_iy, (0,-1)]
 		type_map["j"] = []
-		loc_map = {"diag": (-1,-1), "up": (-1,0), "left": (0,-1)}
 		# Get starting point
 		[start_i, start_j, start_type] = self.get_traceback_start()
 		i = start_i
@@ -176,7 +165,7 @@ class PairwiseAligner:
 				self.alignment[1] += "-"
 				seq1_curr_pos -= 1
 			# Find moves to next cell location
-			next_cell_location = loc_map[type_map[curr_type][2][i, j]]
+			next_cell_location = type_map[curr_type][2]
 			# Find & update type of next cell location
 			curr_type = type_map[curr_type][1][i, j]
 			# Update location
@@ -310,4 +299,3 @@ class NeedlemanWunsch(PairwiseAligner):
 	# Inherited from parent class
 	def check_traceback_end_condition(self, i, j):
 		return (i == 0 and j == 0)
-
