@@ -15,7 +15,7 @@ These are all contained in **Jackie_Roger_BMI203_HW1**. Additional copies of the
 
 #### \_\_init\_\_()
 - This is called automatically when a new class object is created
-- Takes in match/mismatch score matrix type (string), gap opening penalty (int), and gap extension penalty (int)
+- Takes in match/mismatch score matrix type (string), gap opening penalty (negative int), and gap extension penalty (negative int)
 - Returns class object (either SmithWaterman or NeedlemanWunsch)
 
 #### load_scoring_matrix()
