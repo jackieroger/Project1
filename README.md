@@ -9,7 +9,7 @@ python -m pytest test/*
 ```
 
 ### Responses (both parts) and code for part 2
-These are all contained in **Jackie_Roger_BMI203_HW1**. Additional copies of the plots are in the **part2_plots** directory and additional copies of some of the results data are in the **part2_results_data** directory.
+These are all contained in **Jackie_Roger_BMI203_HW1.ipynb**. Additional copies of the plots are in the **part2_plots** directory and additional copies of some of the results data are in the **part2_results_data** directory.
 
 ## Class methods & attributes
 
