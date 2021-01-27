@@ -134,4 +134,18 @@ def test_alignment_score():
 	assert nw_s2 == 7
 	assert nw_s3 == 25
 
+# Test overlap alignment
+def test_overlap():
+	# Make sequences
+	seq1 = "ZEALWEIRD"
+	seq2 = "WEIRDCALM"
+	# Load NW object with overlap alignment
+	nw_overlap = algs.NeedlemanWunsch("BLOSUM50", -3, -1)
+	nw_overlap.load_scoring_matrix()
+	overlap_align = nw_overlap.align(seq1, seq2, overlap=True)
+	overlap_score = nw_overlap.score(seq1, seq2, overlap=True)
+	# Check that they match
+	assert overlap_align == ["WEIRD", "WEIRD"]
+	assert overlap_score == 34
+
 

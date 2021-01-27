@@ -31,12 +31,14 @@ These are all contained in **Jackie_Roger_BMI203_HW1**. Additional copies of the
 - Takes in 2 sequences (strings) to be aligned
 - Returns an alignment (2-element list of strings representing the aligned version of each of the 2 sequences)
 - Creates attributes: **alignment_score** (int representing alignment score for the 2 inputted sequences) and **alignment** (list containing the aligned versions of seq1 and seq2)
+- Optional parameter: for needleman-wunsch alignment, add overlap=True to do an overlap alignment
 
 #### score()
 - This method is similar to align(), but just scores an alignment without doing a traceback to find the actual alignment
 - Takes in 2 sequences (strings) to be aligned
 - Returns an alignment score (int)
 - Creates attribute: **alignment_score** (int representing alignment score for the 2 inputted sequences)
+- Optional parameter: for needleman-wunsch alignment, add overlap=True to do an overlap alignment
 
 ## Example usage
 

@@ -132,7 +132,7 @@ class PairwiseAligner:
 		pass
 
 	# Get alignment between two sequences by tracing back through alignment matrices
-	def get_alignment(self):
+	def get_alignment(self, overlap=False):
 		# Make a dictionary to map from pointers to matrices (for both type & location)
 		type_map = {}
 		type_map["m"] = [self.m, self.pt_m, (-1,-1)]
@@ -140,7 +140,11 @@ class PairwiseAligner:
 		type_map["iy"] = [self.iy, self.pt_iy, (0,-1)]
 		type_map["j"] = []
 		# Get starting point
-		[start_i, start_j, start_type] = self.get_traceback_start()
+		# Overlap alignment
+		if overlap == True:
+			[start_i, start_j, start_type] = self.get_traceback_start(overlap=True)
+		else:
+			[start_i, start_j, start_type] = self.get_traceback_start()
 		i = start_i
 		j = start_j
 		curr_type = start_type
@@ -149,7 +153,7 @@ class PairwiseAligner:
 		seq2_curr_pos = i - 1
 		# Do traceback
 		self.alignment = ["", ""]
-		while self.check_traceback_end_condition(i, j) == False:
+		while self.check_traceback_end_condition(i, j, overlap) == False:
 			# Update alignment
 			if curr_type == "m":
 				self.alignment[0] += self.seq1[seq1_curr_pos]
@@ -177,7 +181,7 @@ class PairwiseAligner:
 
 	# Takes in 2 sequences and returns an alignment (score is saved as self.alignment_score)
 	# The returned alignment is a 2-element list of strings corresponding to the aligned seq1 & seq2
-	def align(self, seq1, seq2):
+	def align(self, seq1, seq2, overlap=False):
 		# Save sequences
 		self.seq1 = seq1
 		self.seq2 = seq2
@@ -191,14 +195,19 @@ class PairwiseAligner:
 		# Get alignment score
 		self.alignment_score = self.get_alignment_score()
 		# Get alignment
-		self.get_alignment()
+		# Overlap alignment
+		if overlap == True:
+			self.get_alignment(overlap=True)
+		# Normal NW
+		else:
+			self.get_alignment()
 		# Return the alignment, which is a 2 element list [alignment of seq1, alignment of seq2]
 		# where dashes (-) represent gaps and underscores (_) represent offsets for local (SW) alignment
 		return self.alignment
 
 	# Takes in 2 sequences and returns an alignment score without doing a traceback or generating alignment output
 	# (useful for part 2 of the assignment)
-	def score(self, seq1, seq2):
+	def score(self, seq1, seq2, overlap=False):
 		# Save sequences
 		self.seq1 = seq1
 		self.seq2 = seq2
@@ -210,7 +219,12 @@ class PairwiseAligner:
 		# Fill in alignment matrices
 		self.call_populate_alignment_matrices()
 		# Get alignment score
-		self.alignment_score = self.get_alignment_score()
+		# Overlap alignment
+		if overlap == True:
+			self.alignment_score = self.get_alignment_score(overlap=True)
+		# Normal NW
+		else:
+			self.alignment_score = self.get_alignment_score()
 		return self.alignment_score
 
 
@@ -232,13 +246,13 @@ class SmithWaterman(PairwiseAligner):
 
 	# Get alignment score between two sequences using alignment matrices
 	# Inherited from parent class
-	def get_alignment_score(self):
+	def get_alignment_score(self, overlap=False):
 		# Find maximum m value
 		return int(np.amax(self.m))
 
 	# Get traceback start
 	# Inherited from parent class
-	def get_traceback_start(self):
+	def get_traceback_start(self, overlap=False):
 		# Find locations of maximum m value(s)
 		max_m_indices = np.where(self.m == np.amax(self.m))
 		max_m_locations = list(zip(max_m_indices[0], max_m_indices[1]))
@@ -249,7 +263,7 @@ class SmithWaterman(PairwiseAligner):
 
 	# Check traceback end condition
 	# Inherited from parent class
-	def check_traceback_end_condition(self, i, j):
+	def check_traceback_end_condition(self, i, j, overlap=False):
 		return (self.m[i,j] == 0)
 
 # Child alignment class for needleman-wunsch alignments
@@ -271,7 +285,18 @@ class NeedlemanWunsch(PairwiseAligner):
 
 	# Get alignment score between two sequences using alignment matrices
 	# Inherited from parent class
-	def get_alignment_score(self):
+	def get_alignment_score(self, overlap=False):
+		# Overlap alignment
+		if overlap == True:
+				start_options = []
+				# Go through right column
+				for i in range(1, self.num_rows):
+					start_options.append(self.m[i, self.num_cols-1])
+				# Go through bottom row
+				for j in range(1, self.num_cols):
+					start_options.append(self.m[self.num_rows-1, j])
+				# Take max
+				return int(max(start_options))
 		# Get values in the bottom right cell
 		m_val = self.m[self.num_rows-1, self.num_cols-1]
 		ix_val = self.ix[self.num_rows-1, self.num_cols-1]
@@ -281,11 +306,26 @@ class NeedlemanWunsch(PairwiseAligner):
 
 	# Get traceback start
 	# Inherited from parent class
-	def get_traceback_start(self):
-		# start i & j are the bottom right cell for needleman-wunsch
+	def get_traceback_start(self, overlap=False):
+		# Overlap alignment
+		if overlap == True:
+				start_options = []
+				# Go through right column
+				for i in range(1, self.num_rows):
+					start_options.append(("m", self.m[i, self.num_cols-1], i, self.num_cols-1))
+				# Go through bottom row
+				for j in range(1, self.num_cols):
+					start_options.append(("m", self.m[self.num_rows-1, j], self.num_rows-1, j))
+				# Sort (decreasing), get the max score (0th tuple), and save the start type for the traceback
+				start_options.sort(key=lambda n: n[1], reverse=True)
+				start_type = start_options[0][0]
+				start_i = start_options[0][2]
+				start_j = start_options[0][3]
+				return [start_i, start_j, start_type]
+		# Go to the bottom right cell
 		start_i = self.num_rows - 1
 		start_j = self.num_cols - 1
-		# start_options is a list of tuples with the type & value for the bottom right cell
+		# Make a list of tuples with the type & value for the bottom right cell
 		start_options = []
 		start_options.append(("m", self.m[self.num_rows-1, self.num_cols-1]))
 		start_options.append(("ix", self.iy[self.num_rows - 1, self.num_cols - 1]))
@@ -297,5 +337,7 @@ class NeedlemanWunsch(PairwiseAligner):
 
 	# Check traceback end condition
 	# Inherited from parent class
-	def check_traceback_end_condition(self, i, j):
+	def check_traceback_end_condition(self, i, j, overlap=False):
+		if overlap == True:
+			return (i == 0 or j == 0)
 		return (i == 0 and j == 0)
