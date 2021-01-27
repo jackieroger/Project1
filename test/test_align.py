@@ -112,7 +112,7 @@ def test_alignment_score():
 	seq2 = "ACALMA"
 	seq3 = "ACACT"
 	seq4 = "AAT"
-	seq5 = "HEAGAWEGHEE"
+	seq5 = "HEAGAWGHEE"
 	seq6 = "PAWHEAE"
 	# Load SW & NW objects
 	sw = algs.SmithWaterman("BLOSUM50", -3, -1)
@@ -129,23 +129,28 @@ def test_alignment_score():
 	# Check that they match
 	assert sw_s1 == 30
 	assert sw_s2 == 9
-	assert sw_s3 == 33
+	assert sw_s3 == 34
 	assert nw_s1 == 22
 	assert nw_s2 == 7
-	assert nw_s3 == 25
+	assert nw_s3 == 26
 
-# Test overlap alignment
+# For 2 different alignments, test overlap alignment (both alignments & scores)
 def test_overlap():
 	# Make sequences
 	seq1 = "ZEALWEIRD"
 	seq2 = "WEIRDCALM"
+	seq3 = "HEAGAWGHEE"
+	seq4 = "PAWHEAE"
 	# Load NW object with overlap alignment
-	nw_overlap = algs.NeedlemanWunsch("BLOSUM50", -3, -1)
+	nw_overlap = algs.NeedlemanWunsch("BLOSUM50", -8, -2)
 	nw_overlap.load_scoring_matrix()
-	overlap_align = nw_overlap.align(seq1, seq2, overlap=True)
-	overlap_score = nw_overlap.score(seq1, seq2, overlap=True)
+	# Do alignments & scoring
+	overlap_align1 = nw_overlap.align(seq1, seq2, overlap=True)
+	overlap_score1 = nw_overlap.score(seq1, seq2, overlap=True)
+	overlap_align2 = nw_overlap.align(seq3, seq4, overlap=True)
+	overlap_score2 = nw_overlap.score(seq3, seq4, overlap=True)
 	# Check that they match
-	assert overlap_align == ["WEIRD", "WEIRD"]
-	assert overlap_score == 34
-
-
+	assert overlap_align1 == ["WEIRD", "WEIRD"]
+	assert overlap_score1 == 25
+	assert overlap_align2 == ["GAWGHEE", "PAW-HEA"]
+	assert overlap_score2 == 9
