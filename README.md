@@ -2,17 +2,14 @@
 
 ![BuildStatus](https://github.com/jackieroger/Project1/workflows/HW1/badge.svg?event=push)
 
-### Main
-To run the code in align/\_\_main\_\_.py which contains the code for part 2, run the following command from the root directory of this project:
-```
-python -m align
-```
-
-### Testing
+### Testing for part 1
 To run the unit tests for part 1, run the following command from the root directory of this project:
 ```
 python -m pytest test/*
 ```
+
+### Responses (both parts) and code for part 2
+These are all contained in **Jackie_Roger_BMI203_HW1**. Additional copies of the plots are in the **plots** directory and additional copies of some of the results data are in the **part2_results_data** directory.
 
 ## Class methods & attributes
 
