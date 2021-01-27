@@ -83,6 +83,8 @@ class PairwiseAligner:
 
 	# Fill in each alignment matrix using ~dynamic programming~
 	# Start near the top left corner and slowly work down/right through the matrices
+	# Note about my implementation of gap penalties: when a gap is started, the cost
+	# is gap opening penalty + gap extension penalty
 	def populate_alignment_matrices(self, sw=False):
 		# Iterate through each row (0th row is already set up)
 		for i in range(1, self.num_rows):
